@@ -34,7 +34,25 @@ data = {
 
 * `strTitle` : video_title
 
-* `intTimestamp` : integer_timestamp # we can retrieve the actual timestamp from this for additional feature
+* `intTimestamp` : integer_timestamp `|` we can retrieve the actual timestamp from this for additional feature
 
 * `intCount` : number_of_views
 
+### Basic installation
+
+```
+sudo apt update
+sudo apt -y upgrade
+sudo apt install -y python3-pip
+pip install -r reqs.txt
+sudo ufw allow 8080
+sudo apt install tmux
+```
+
+### Launch
+
+```
+tmux
+python3 main.py 
+Ctrl+b d
+```
