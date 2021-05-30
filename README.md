@@ -47,7 +47,13 @@ sudo apt install -y python3-pip
 pip install -r reqs.txt
 sudo ufw allow 8080
 sudo apt install tmux
+sudo apt install -y mongodb
 ```
+
+* MongoDB setup (https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-18-04)
+
+* To enter the shell, `mongo` ; `use inclear` `|` database name
+
 
 ### Launch
 
