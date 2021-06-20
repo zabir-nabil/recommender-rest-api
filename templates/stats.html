@@ -1,0 +1,70 @@
+<html>
+<head>
+    <title>Video Recommender Stats</title>
+    <style>
+        #customers {
+          font-family: Arial, Helvetica, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+        
+        #customers td, #customers th {
+          border: 1px solid #ddd;
+          padding: 8px;
+        }
+        
+        #customers tr:nth-child(even){background-color: #f2f2f2;}
+        
+        #customers tr:hover {background-color: #ddd;}
+        
+        #customers th {
+          padding-top: 12px;
+          padding-bottom: 12px;
+          text-align: left;
+          background-color: #04AA6D;
+          color: white;
+        }
+        /* Style the body */
+        body {
+        font-family: Arial;
+        margin: 0;
+        }
+
+        /* Header/Logo Title */
+        .header {
+        padding: 60px;
+        text-align: center;
+        background: #1abc9c;
+        color: white;
+        font-size: 30px;
+        }
+
+        /* Page Content */
+        .content {padding:20px;}
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Video Recommender Stats</h1>
+        <p>A table containing date, video count.</p>
+      </div>
+
+    <table id="customers">
+        <th>    Date       </th>
+        <th>  Video Count  </th>
+        {% for key, value in result.items() %}
+           <tr>
+                
+                <td> {{ key }} </td>
+                
+                <td> {{ value }} </td>
+           </tr>
+        {% endfor %}
+    </table>
+    <div class="header">
+        
+        <p> &copy; inclear, 2021</p>
+      </div>
+</body>
+</html>

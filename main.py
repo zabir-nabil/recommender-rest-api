@@ -1,6 +1,7 @@
 from typing import List, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from flurs.recommender import MFRecommender
@@ -10,9 +11,30 @@ import numpy as np
 import uvicorn
 import pymongo
 
+# web page, table
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+import datetime
+
 threshold = 0.75
 
 app = FastAPI()
+
+# handling cors
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
 app.recommender = MFRecommender(k=40) # attaching recommender to the fastapi server
 app.recommender.initialize()
 
@@ -59,6 +81,7 @@ def user_recom(user_id: str, is_new: Optional[bool] = None):
         potential_video_indices = np.array(range(n_vids)) # initially select all videos
         vids, vscores = app.recommender.recommend(user_idx, potential_video_indices)
         vidents = []
+        vp_score = []
 
         for vi, vs in zip(vids, vscores):
             if vs > threshold:
@@ -67,9 +90,10 @@ def user_recom(user_id: str, is_new: Optional[bool] = None):
                 qr = app.db["videos"].find_one(q)
                 try:
                     vidents.append(qr["strIdent"])
+                    vp_score.append(vs)
                 except:
                     print("some internal database error")
-        return {"video_strIndents": vidents, "msg": "success"}
+        return {"video_strIndents": vidents, "video_recommendation_score": vp_score, "msg": "success"}
 
 
 
@@ -120,6 +144,22 @@ def user_recom_with_data(user: UserH):
 def video_recom_with_data(video: Video):
     return {"video_id": video.strIdent, "video_title": video.strTitle}
 
+# simple web page
+@app.get("/stats", response_class=HTMLResponse)
+async def read_item(request: Request):
+    col = app.db["videos"] # user view
+    
+    id_ = col.find({})
+    
+    date_mapper = {}
+    vids = list(id_)
+
+    for v in vids:
+        dt = v['intTimestamp']
+        date = datetime.datetime.fromtimestamp(dt / 1e3).date()
+        # print(date)
+        date_mapper[str(date)] = date_mapper.get(str(date), 0) + 1
+    return templates.TemplateResponse("stats.html", {"request": request, "name": "nabil", "result": date_mapper})
 
 if __name__ == '__main__':
     uvicorn.run(app, port=80, host='0.0.0.0')
